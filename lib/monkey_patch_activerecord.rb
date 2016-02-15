@@ -128,7 +128,9 @@ module ActiveRecord
       im = arel.create_insert
 
       # ****** BEGIN PARTITIONED PATCH ******
-      actual_arel_table = @klass.dynamic_arel_table(Hash[*values.map{|k,v| [k.name,v]}.flatten]) if @klass.respond_to?(:dynamic_arel_table)
+      if @klass.respond_to?(:dynamic_arel_table)
+        actual_arel_table = @klass.dynamic_arel_table(Hash[*values.inject([]) { |result, (k, v)| result += [k.name, v] }])
+      end
       actual_arel_table = @table unless actual_arel_table
       # Original line:
       # im.into @table
@@ -175,7 +177,7 @@ module ActiveRecord
 
       # ****** BEGIN PARTITIONED PATCH ******
       if @klass.respond_to?(:dynamic_arel_table)
-        using_arel_table = @klass.dynamic_arel_table(Hash[*values.map { |k,v| [k.name,v] }.flatten])
+        using_arel_table = @klass.dynamic_arel_table(Hash[*values.inject([]) { |result, (k, v)| result += [k.name, v] }])
         um = scope.where(using_arel_table[@klass.primary_key].eq(id_was || id)).arel.compile_update(substitutes, @klass.primary_key)
 
         # NOTE(hofer): The um variable got set up using
