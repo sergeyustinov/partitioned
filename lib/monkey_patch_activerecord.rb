@@ -12,7 +12,7 @@ require 'active_record/relation/query_methods.rb'
 module ActiveRecord
   #
   # Patches for Persistence to allow certain partitioning (that related to the primary key) to work.
-	# Monkeypatch based on:
+  # # Monkeypatch based on:
   # https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/persistence.rb
   #
   module Persistence
@@ -113,7 +113,7 @@ module ActiveRecord
 
   end # module QueryMethods
 
-	# NOTE(hofer): Monkeypatch based on this file:
+  # NOTE(hofer): Monkeypatch based on this file:
   # https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/relation.rb
   class Relation
 
@@ -145,7 +145,7 @@ module ActiveRecord
       im.into actual_arel_table
       # ****** END PARTITIONED PATCH ******
 
-			substitutes, binds = substitute_values values
+      substitutes, binds = substitute_values values
 
       if values.empty? # empty insert
         im.values = Arel.sql(connection.empty_insert_statement_value)
@@ -177,7 +177,7 @@ module ActiveRecord
       # ****** BEGIN PARTITIONED PATCH ******
       if @klass.respond_to?(:dynamic_arel_table)
         using_arel_table = @klass.dynamic_arel_table(Hash[*values.inject([]) { |result, (k, v)| result += [k.name, v] }])
-				relation = scope.where(using_arel_table[@klass.primary_key].eq(id_was || id))
+        relation = scope.where(using_arel_table[@klass.primary_key].eq(id_was || id))
         bvs = binds + relation.bind_values
         um = relation
           .arel
